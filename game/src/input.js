@@ -1,49 +1,57 @@
-// Keyboard and mouse, and the pointer lock that turns the mouse into look. Plain browser
-// APIs only: the game asks the canvas for pointer lock and reads movementX/Y while it holds it.
-export function createInput(canvas, onLockChange) {
-  const keys = new Set();
-  const state = { keys, locked: false, firing: false, lookX: 0, lookY: 0 };
+// HARBOURFALL — input.js
+// Raw keyboard and mouse state, nothing more: a key set, mouse buttons,
+// accumulated look deltas and the pointer-lock plumbing. player.js and
+// hud.js read this; the simulation never touches the DOM directly.
 
-  function setKey(event, down) {
-    if (down) keys.add(event.code);
-    else keys.delete(event.code);
-    if (event.code === 'Space') event.preventDefault();
-  }
+export const input = {
+  keys: new Set(),
+  mouseDown: false,
+  lookDX: 0,
+  lookDY: 0,
+  locked: false,
+  wheel: 0,
+};
 
-  window.addEventListener('keydown', (event) => setKey(event, true));
-  window.addEventListener('keyup', (event) => setKey(event, false));
-  window.addEventListener('blur', () => keys.clear());
-  window.addEventListener('mousemove', (event) => {
-    if (!state.locked) return;
-    state.lookX += event.movementX;
-    state.lookY += event.movementY;
+let canvasEl = null;
+
+export function initInput(canvas, onLockChange) {
+  canvasEl = canvas;
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Tab') e.preventDefault();
+    input.keys.add(e.code);
   });
-  window.addEventListener('mousedown', (event) => {
-    if (state.locked && event.button === 0) state.firing = true;
+  window.addEventListener('keyup', (e) => input.keys.delete(e.code));
+  window.addEventListener('blur', () => { input.keys.clear(); input.mouseDown = false; });
+  canvas.addEventListener('mousedown', (e) => { if (e.button === 0) input.mouseDown = true; });
+  window.addEventListener('mouseup', (e) => { if (e.button === 0) input.mouseDown = false; });
+  window.addEventListener('mousemove', (e) => {
+    if (!input.locked) return;
+    input.lookDX += e.movementX || 0;
+    input.lookDY += e.movementY || 0;
   });
-  window.addEventListener('mouseup', (event) => {
-    if (event.button === 0) state.firing = false;
-  });
+  window.addEventListener('wheel', (e) => { input.wheel += Math.sign(e.deltaY); }, { passive: true });
   document.addEventListener('pointerlockchange', () => {
-    state.locked = document.pointerLockElement === canvas;
-    if (!state.locked) {
-      keys.clear();
-      state.firing = false;
-    }
-    onLockChange(state.locked);
+    input.locked = document.pointerLockElement === canvas;
+    if (onLockChange) onLockChange(input.locked);
   });
+}
 
-  return {
-    state,
-    requestLock() {
-      canvas.requestPointerLock();
-    },
-    takeLook() {
-      const x = state.lookX;
-      const y = state.lookY;
-      state.lookX = 0;
-      state.lookY = 0;
-      return { x, y };
-    },
-  };
+export function requestLock() {
+  if (canvasEl && !input.locked) canvasEl.requestPointerLock();
+}
+export function releaseLock() {
+  if (input.locked) document.exitPointerLock();
+}
+// One-shot key test: true only on the step the key first goes down.
+const prev = new Set();
+export function keyPressed(code) {
+  const down = input.keys.has(code);
+  const was = prev.has(code);
+  if (down) prev.add(code); else prev.delete(code);
+  return down && !was;
+}
+export function consumeLook() {
+  const dx = input.lookDX, dy = input.lookDY;
+  input.lookDX = 0; input.lookDY = 0;
+  return { dx, dy };
 }
