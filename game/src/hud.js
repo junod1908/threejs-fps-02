@@ -5,7 +5,7 @@
 // DOM; the simulation only writes state, and main.js forwards the events
 // that should flash a hitmarker, redden the screen edge or white it out.
 
-import { BUY_ITEMS, WEAPONS, PLANT_TIME, DEFUSE_TIME, TEAM_NAMES } from './config.js';
+import { BUY_ITEMS, WEAPONS, PLANT_TIME, DEFUSE_TIME, TEAM_NAMES, FREEZE_TIME } from './config.js';
 import { COLS, ROWS, isSolidCell, SITES } from './map.js';
 import { isAttacker, attackingCrew } from './state.js';
 import { input, keyPressed } from './input.js';
@@ -78,7 +78,7 @@ export function updateHud(state) {
   const t = state.time;
   // ---- top bar: clock, score, phase
   let clock = '';
-  if (state.phase === 'freeze') clock = fmtTime(state.phaseEndsAt - t);
+  if (state.phase === 'freeze') clock = fmtTime(Math.min(state.phaseEndsAt - t, FREEZE_TIME));
   else if (state.phase === 'live' || state.phase === 'planted') clock = fmtTime(state.roundTimer);
   els.timer.textContent = clock;
   els.timer.classList.toggle('danger', state.phase === 'planted' || (state.phase === 'live' && state.roundTimer < 11));

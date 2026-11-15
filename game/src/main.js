@@ -44,6 +44,8 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.22;
 document.getElementById('game').appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -174,16 +176,17 @@ function stageShot(kind) {
   startMatch(state);
   if (kind === 'start') {
     human.money = 4200;
+    place(human, -32, 22, 0.35);
     state.phaseEndsAt = state.time + 999;      // hold the buy phase open
   } else if (kind === 'play') {
     state.crews[0].score = 2; state.crews[1].score = 1;
     state.round = 4;
     giveRifle(human);
-    place(human, 0, 6, 0.6);
+    place(human, 0, 10, 0.15);
     const foes = state.actors.filter((a) => a.crew === 1);
-    place(foes[0], -4, -8, 2.6); place(foes[1], 12, -10, 2.9); place(foes[2], -11, -4, 1.9);
+    place(foes[0], -2, -2, 3.0); place(foes[1], 6, -6, 3.1); place(foes[2], -9, 2, 2.6);
     const mates = state.actors.filter((a) => a.crew === 0 && a !== human);
-    place(mates[0], -5, 10, 0.4); place(mates[1], 9, 12, 2.8);
+    place(mates[0], 3, 16, 0.2); place(mates[1], -4, 18, 0.9);
     state.phase = 'live';
     state.phaseEndsAt = state.time + 47;
   } else if (kind === 'site') {
@@ -196,7 +199,7 @@ function stageShot(kind) {
     if (b.carrier) b.carrier.hasBomb = false;
     b.carrier = null;
     human.hasBomb = false;
-    place(human, SITES.A.x + 11, SITES.A.z + 4, 2.6);
+    place(human, SITES.A.x - 3, SITES.A.z + 4, -0.6);
     const foes = state.actors.filter((a) => a.crew === 1);
     place(foes[0], SITES.A.x - 6, SITES.A.z - 3, 0.8);
     place(foes[1], SITES.A.x + 2, SITES.A.z + 11, 2.4);
@@ -211,7 +214,7 @@ function stageShot(kind) {
     showOverlay('VICTORY — VIPERS 9 · 6 WARDENS', 'The yard is yours. Final scoreboard below; click to run it back.', 'Play again');
   }
   let frames = 0;
-  const mark = () => { if (++frames > 100) window.__shotReady = true; else requestAnimationFrame(mark); };
+  const mark = () => { if (++frames > 70) window.__shotReady = true; else requestAnimationFrame(mark); };
   requestAnimationFrame(mark);
 }
 function giveRifle(actor) {

@@ -199,11 +199,11 @@ function siteDecalTex(letter, color) {
 // ------------------------------------------------------------ scene build
 export function buildMap(scene) {
   scene.background = new THREE.Color(PALETTE.sky);
-  scene.fog = new THREE.Fog(PALETTE.fog, 55, 150);
+  scene.fog = new THREE.Fog(PALETTE.fog, 60, 175);
 
-  const hemi = new THREE.HemisphereLight(0x8fa3c4, 0x2c2620, 0.85);
+  const hemi = new THREE.HemisphereLight(0x9db1d4, 0x4a4034, 1.5);
   scene.add(hemi);
-  const sun = new THREE.DirectionalLight(0xffb45e, 1.6);
+  const sun = new THREE.DirectionalLight(0xffb45e, 2.0);
   sun.position.set(-40, 34, -18);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -277,7 +277,7 @@ export function buildMap(scene) {
     bulb.position.set(x, 5.6, z);
     scene.add(bulb);
     if (i % 2 === 0) {
-      const light = new THREE.PointLight(PALETTE.lamp, 30, 26, 1.8);
+      const light = new THREE.PointLight(PALETTE.lamp, 100, 30, 1.8);
       light.position.set(x, 5.4, z);
       scene.add(light);
     }

@@ -102,13 +102,13 @@ export const BOT = {
 // Dusk over a container terminal: slate blue darks, sodium-lamp amber,
 // container teal and rust, one signal red for the pack.
 export const PALETTE = {
-  sky: 0x1a2230,
-  fog: 0x232f42,
-  ground: '#3d4148',
-  wall: '#565d66',
-  wallDark: '#434a53',
-  crate: '#7a5c38',
-  containers: ['#2e6f6a', '#8a4a2b', '#33506e', '#6e3a3a', '#4a6741', '#77683a'],
+  sky: 0x2b3648,
+  fog: 0x2b3648,
+  ground: '#585d64',
+  wall: '#6d757f',
+  wallDark: '#545c66',
+  crate: '#94713f',
+  containers: ['#35958c', '#a85c30', '#40678c', '#8c4a44', '#5d7d4f', '#97824a'],
   siteA: '#e08a2e',
   siteB: '#2ea8e0',
   atk: 0xe08a2e,                         // Vipers amber
